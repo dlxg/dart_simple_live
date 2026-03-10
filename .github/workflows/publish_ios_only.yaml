@@ -15,12 +15,11 @@ jobs:
       # 签出代码（默认当前触发分支）
       - uses: actions/checkout@v4
 
-      # 设置 JAVA 环境（Flutter 构建依赖）
+      # 设置 JAVA 环境（Flutter 构建依赖，无缓存以避免无效路径报错）
       - uses: actions/setup-java@v4
         with:
           distribution: "zulu"
           java-version: "17"
-          cache: "gradle"
 
       # 设置 Flutter
       - name: Flutter action
