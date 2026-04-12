@@ -1,11 +1,11 @@
-name: app-build-ios-only
+name: app-build-ios-macos
 
 on:
   workflow_dispatch:
 
 jobs:
-  # 仅打包 iOS
-  build-ios:
+  # 打包 iOS 和 macOS
+  build-ios-macos:
     runs-on: macos-latest
 
     permissions:
@@ -28,11 +28,23 @@ jobs:
           flutter-version: "3.38.x"
           cache: true
 
+      # 打开 MAC Desktop 支持
+      - name: Enable Flutter Desktop
+        run: flutter config --enable-macos-desktop
+
       # 更新 Flutter 的 packages
       - name: Restore packages
         run: |
           cd simple_live_app
           flutter pub get
+
+      # 安装 appdmg
+      - name: Install appdmg
+        run: npm install -g appdmg
+
+      # 设置 flutter_distributor 环境
+      - name: Install flutter_distributor
+        run: dart pub global activate flutter_distributor
 
       # 打包 iOS
       - name: Build IPA (no codesign)
@@ -58,6 +70,20 @@ jobs:
           path: |
             simple_live_app/build/ios/iphoneos/ios_no_sign.ipa
 
-      # 完成
-      - run: echo "🍏 iOS-only job's status is ${{ job.status }}."
+      # 打包 macOS
+      - name: Build MacOS
+        run: |
+          cd simple_live_app
+          flutter_distributor package --platform macos --targets dmg,zip --skip-clean
 
+      # 上传 macOS 至 Artifacts
+      - name: Upload MacOS to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: |
+            simple_live_app/build/dist/*/*.dmg
+            simple_live_app/build/dist/*/*.zip
+
+      # 完成
+      - run: echo "🍏 iOS + macOS job's status is ${{ job.status }}."
