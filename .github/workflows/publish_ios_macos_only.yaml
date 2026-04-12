@@ -46,6 +46,10 @@ jobs:
       - name: Install flutter_distributor
         run: dart pub global activate flutter_distributor
 
+      # 将 Dart 全局可执行目录加入 PATH，供后续 flutter_distributor 使用
+      - name: Add Dart pub cache to PATH
+        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
       # 打包 iOS
       - name: Build IPA (no codesign)
         run: |
