@@ -12,10 +12,10 @@ jobs:
       contents: write
 
     steps:
-      # 签出 dev 分支代码，和现有发布流程保持一致
+      # 签出当前触发工作流的分支/提交
       - uses: actions/checkout@v5
         with:
-          ref: dev
+          ref: ${{ github.ref }}
 
       # 设置 JAVA 环境
       - uses: actions/setup-java@v5
